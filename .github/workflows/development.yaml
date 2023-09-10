@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: development
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install rust environment
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: wasm32-wasi
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Run cargo check
+        uses: actions-rs/cargo@v1
+        with:
+          command: check
+      - name: Build plugin
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+      - uses: actions/upload-artifact@v3
+        with:
+          name: plugin.wasm
+          path: target/wasm32-wasi/debug/rust-plugin-example.wasm
+          if-no-files-found: warn
